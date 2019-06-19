@@ -1,0 +1,40 @@
+SHELL=/bin/bash -o pipefail
+TARGET?=$(shell uname -m)
+LIBDIR?=lib
+LOCALLIB?="/usr/local/src/TensorRT-4.0.1.6/lib/"
+VERBOSE?=0
+ifeq ($(VERBOSE), 1)
+AT=
+else
+AT=@
+endif
+TRIPLE=x86_64-linux
+ifeq ($(TARGET), aarch64)
+TRIPLE=aarch64-linux
+endif
+export TARGET
+export VERBOSE
+export LIBDIR
+export TRIPLE
+export LOCALLIB
+samples=sampleUffMNIST
+.PHONY: all clean help test test_debug test_release
+all:
+	$(AT)$(foreach sample,$(samples), $(MAKE) -C $(sample) &&) :
+
+clean:
+	$(AT)$(foreach sample,$(samples), $(MAKE) clean -C $(sample) &&) :
+
+help:
+	$(AT)echo "Sample building help menu."
+	$(AT)echo "Samples:"
+	$(AT)$(foreach sample,$(samples), echo "\t$(sample)" &&) :
+	$(AT)echo "\nCommands:"
+	$(AT)echo "\tall - build all samples."
+	$(AT)echo "\tclean - clean all samples."
+	$(AT)echo "\ttest[_debug|_release] - test all/release/debug samples."
+	$(AT)echo "\nVariables:"
+	$(AT)echo "\tTARGET - Specify the target to build for."
+	$(AT)echo "\tVERBOSE - Specify verbose output."
+	$(AT)echo "\tCUDA_INSTALL_DIR - Directory where cuda installs to."
+
